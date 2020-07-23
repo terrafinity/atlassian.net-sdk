@@ -160,6 +160,16 @@ namespace Atlassian.Jira.Linq
             // field
             _jqlWhere.Append(fieldName);
 
+            // special cases for empty/null string
+            if (fieldValue == null || fieldValue.Equals(""))
+            {
+                _jqlWhere.Append(" ");
+                _jqlWhere.Append(equal ? JiraOperators.IS : JiraOperators.ISNOT);
+                _jqlWhere.Append(" ");
+                _jqlWhere.Append(fieldValue == null ? "null" : "empty");
+                return;
+            }
+
             // operator
             string operatorString;
             if (fieldValue is string)
@@ -362,7 +372,7 @@ namespace Atlassian.Jira.Linq
                 case ExpressionType.OrElse:
                     ProcessUnionOperator(node, JiraOperators.OR);
                     break;
-
+                
                 default:
                     throw new NotSupportedException(String.Format("Expression type '{0}' is not supported.", node.NodeType));
 
